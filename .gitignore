@@ -4,3 +4,6 @@ __pycache__/
 out/
 dist/
 build/
+
+# local pre-commit cache
+.pc-home/
