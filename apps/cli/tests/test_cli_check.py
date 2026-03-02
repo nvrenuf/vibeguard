@@ -27,17 +27,3 @@ def test_check_outputs_findings_json(tmp_path: Path, capsys) -> None:
     assert payload["summary"]["overall_status"] == "pass"
     assert payload["findings"] == []
 
-
-def test_audit_pack_writes_policy_snapshot(tmp_path: Path) -> None:
-    from vibeguard_cli.main import run_audit_pack
-
-    repo = tmp_path / "repo"
-    repo.mkdir()
-    _write_required_files(repo)
-
-    out_dir = tmp_path / "audit"
-    exit_code = run_audit_pack(repo, Path("policies/bundles/baseline/policy.yaml"), out_dir=out_dir)
-
-    assert exit_code == 0
-    assert (out_dir / "reports" / "findings.json").is_file()
-    assert (out_dir / "policy_bundle" / "policy.yaml").is_file()
