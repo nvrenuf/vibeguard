@@ -38,9 +38,9 @@
    - Run VibeGuard checks in PR CI workflows.
 18. #19 ✅ Add release versioning (PR #31)
    - Define automated release/versioning mechanics.
-19. #20 ✅ Wizard spec-to-policy compiler (PR TBD)
+19. #20 ✅ Wizard spec-to-policy compiler (PR #38)
    - Compile wizard specs into policy bundles.
-20. #21 ✅ Wizard template + docs (PR TBD)
+20. #21 ✅ Wizard template + docs (PR #38)
    - Ship wizard templates and authoring docs.
 21. #22 Add threat model checks for agentic risk
    - Add hardening checks for agentic threat-model risk.
