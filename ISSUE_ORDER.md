@@ -6,27 +6,27 @@
    - Lock scope boundaries and shared definitions for v0.1 delivery.
 2. #3 Single canonical “VibeGuard Core” flow doc
    - Publish one canonical end-to-end Core flow for implementers.
-3. #4 Implement policy bundle loader
+3. #4 ✅ Implement policy bundle loader (PR #24)
    - Add deterministic policy bundle loading behavior.
-4. #5 Implement policy schema validation
+4. #5 ✅ Implement policy schema validation (PR #24)
    - Validate policy bundles against the canonical schema.
-5. #6 Add policy bundle versioning + metadata
+5. #6 ✅ Add policy bundle versioning + metadata (PR #24)
    - Require version/provenance metadata in policy bundles.
-6. #7 Define canonical Findings JSON format
+6. #7 ✅ Define canonical Findings JSON format (PR #24)
    - Standardize Findings JSON schema for all outputs.
 7. #8 Add SARIF output option
    - Provide SARIF as an alternate findings export.
-8. #9 Implement gate runner framework
+8. #9 ✅ Implement gate runner framework (PR #25)
    - Create gate execution and aggregation framework.
-9. #10 Implement baseline gates (VG001-VG005)
+9. #10 ✅ Implement baseline gates (VG001-VG005) (PR #25, #26, #27)
    - Implement baseline gate set VG001-VG005.
-10. #11 Implement scope filters for gates
+10. #11 ✅ Implement scope filters for gates (PR #26)
    - Support include/exclude scope filters for gate runs.
-11. #12 Implement audit pack directory structure
+11. #12 ✅ Implement audit pack directory structure (PR #28)
    - Define canonical audit-pack directory layout.
-12. #13 Manifest + hashing
+12. #13 ✅ Manifest + hashing (PR #28)
    - Add manifest generation and file hashing.
-13. #14 Environment + toolchain metadata capture
+13. #14 ✅ Environment + toolchain metadata capture (PR #28)
    - Capture environment/toolchain metadata in audit packs.
 14. #15 CLI: implement vibeguard check fully
    - Complete vibeguard check command behavior and UX.
