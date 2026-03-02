@@ -31,7 +31,12 @@
       "id": "VG003",
       "enabled": true,
       "config": {
-        "allow_paths": [],
+        "allow_paths": [
+          "apps/**/tests/**",
+          "spec/**",
+          "**/*.md",
+          "packages/gates/**"
+        ],
         "allow_patterns": []
       }
     },
