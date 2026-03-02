@@ -35,6 +35,13 @@ A deterministic engine that:
 Runtime surfaces (v0):
 - `vibeguard` CLI: `apps/cli/`
 
+Core flow wiring in v0.1:
+1) Wizard constraints are defined in spec artifacts.
+2) Code Agent changes are produced in-repo.
+3) Gate runner executes policy bundle checks (`vibeguard check`).
+4) Human approval happens at PR review/merge boundary.
+5) Audit evidence is exported (`vibeguard audit-pack`).
+
 ### 3) Policy bundles
 Versioned policy definitions (YAML) for:
 - dependency allow/deny (licenses, ecosystems)
@@ -73,6 +80,8 @@ Schema + templates: `audit-pack/`
 
 - Gate runs emit a structured JSON report (and optional human summary).
 - Every gate run has a run ID, timestamp, policy bundle identifier, and git revision.
+- SARIF output is available from CLI for ecosystem tooling.
+- Report metadata includes policy versioning fields to support v0.1 traceability.
 
 ## Change control
 
