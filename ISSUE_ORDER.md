@@ -28,8 +28,8 @@
    - Add manifest generation and file hashing.
 13. #14 ✅ Environment + toolchain metadata capture (PR #28)
    - Capture environment/toolchain metadata in audit packs.
-14. #15 CLI: implement vibeguard check fully
-   - Complete vibeguard check command behavior and UX.
+14. #15 ✅ CLI: implement vibeguard check fully (PR #38)
+   - Complete vibeguard check command behavior and UX, including baseline VG003 false-positive allowlist handling.
 15. #16 CLI: implement vibeguard audit-pack fully
    - Complete vibeguard audit-pack command behavior and UX.
 16. #17 CLI: add vibeguard init
