@@ -34,6 +34,23 @@
         "allow_paths": [],
         "allow_patterns": []
       }
+    },
+    {
+      "id": "VG004",
+      "enabled": true,
+      "config": {
+        "require_license": true,
+        "require_third_party_notices": false,
+        "license_paths": ["LICENSE", "LICENSE.md", "LICENSE.txt"],
+        "notices_paths": ["THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.txt"]
+      }
+    },
+    {
+      "id": "VG005",
+      "enabled": true,
+      "config": {
+        "required_workflows": [".github/workflows/verify.yml"]
+      }
     }
   ]
 }

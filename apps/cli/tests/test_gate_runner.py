@@ -10,6 +10,10 @@ REQUIRED_FILES = ["README.md", "SECURITY.md", "ARCHITECTURE.md", "AGENTS.md", "I
 def _write_required_files(repo: Path) -> None:
     for file_name in REQUIRED_FILES:
         (repo / file_name).write_text("ok\n", encoding="utf-8")
+    (repo / "LICENSE").write_text("MIT\n", encoding="utf-8")
+    workflow_dir = repo / ".github" / "workflows"
+    workflow_dir.mkdir(parents=True, exist_ok=True)
+    (workflow_dir / "verify.yml").write_text("name: verify\n", encoding="utf-8")
 
 
 def test_unknown_gate_fails_closed(tmp_path: Path) -> None:
