@@ -52,31 +52,122 @@ pre-commit install
 make verify
 ```
 
-Run the CLI (skeleton):
+Run the CLI:
 ```bash
-vibeguard --help
+PYTHONPATH=apps/cli:$PYTHONPATH .venv/bin/python -m vibeguard_cli.main --help
 ```
 
 ## CLI commands (v0.1)
 
-`vibeguard check <repo>`
+Version information:
+- `vibeguard --version` is not currently implemented as a CLI flag in v0.1.
+- Source-of-truth version is in `apps/cli/pyproject.toml` (`version = "0.1.0"`).
+
+```bash
+rg '^version\\s*=\\s*\"' apps/cli/pyproject.toml
+```
+
+`check` command:
+
+```bash
+PYTHONPATH=apps/cli:$PYTHONPATH .venv/bin/python -m vibeguard_cli.main check . \
+  --policy policies/bundles/baseline/policy.yaml \
+  --fail-on high
+```
+
+Supported flags:
 - `--policy <path>` policy bundle path (default baseline policy)
 - `--out <path>` write output to file (default stdout)
 - `--fail-on low|medium|high|critical` severity threshold for non-zero exit
-- `--format json|sarif` output format (SARIF supported for integrations)
+- `--format json|sarif` output format
 
-`vibeguard audit-pack <repo>`
+SARIF example:
+
+```bash
+PYTHONPATH=apps/cli:$PYTHONPATH .venv/bin/python -m vibeguard_cli.main check . \
+  --policy policies/bundles/baseline/policy.yaml \
+  --format sarif \
+  --out out/findings.sarif
+```
+
+`audit-pack` command:
+
+```bash
+PYTHONPATH=apps/cli:$PYTHONPATH .venv/bin/python -m vibeguard_cli.main audit-pack . \
+  --policy policies/bundles/baseline/policy.yaml \
+  --out-dir out/audit-pack
+```
+
+Supported flags:
 - `--policy <path>`
 - `--out-dir <path>`
 - `--force-pack` always exit 0 after writing pack, even when findings fail
 
-`vibeguard init [target]`
+`init` command:
+
+```bash
+PYTHONPATH=apps/cli:$PYTHONPATH .venv/bin/python -m vibeguard_cli.main init .
+```
+
+Supported flags:
 - scaffolds baseline policy and recommended output folders
 - `--force` overwrites generated policy file when present
 
-Versioning in v0.1:
-- reports and policy metadata carry `policy_version`
-- release-process hardening beyond this is tracked in roadmap post-v0.1
+`wizard compile` command:
+
+```bash
+PYTHONPATH=apps/cli:$PYTHONPATH .venv/bin/python -m vibeguard_cli.main wizard compile \
+  --in wizard/template.yaml \
+  --out policies/bundles/generated/policy.yaml
+```
+
+## Baseline gates (v0.1)
+
+Current baseline bundle (`policies/bundles/baseline/policy.yaml`) includes:
+- `VG001`: required files at repo root
+- `VG002`: forbidden root paths (for example build artifacts/secrets dirs)
+- `VG003`: high-confidence secret pattern scan
+- `VG004`: license / notices requirements
+- `VG005`: required CI workflow presence
+
+Scope and allowlist notes:
+- Global `include_paths` / `exclude_paths` are supported by policy.
+- Per-gate `include_paths` / `exclude_paths` overrides are supported.
+- `VG003` supports:
+  - `allow_paths` glob exclusions
+  - `allow_patterns` regex suppressions for matched token text classes
+
+## Audit pack output
+
+`audit-pack` writes a run directory under `out/audit-pack/<run-id>/` with:
+- `manifest.json`
+- `reports/findings.json`
+- `reports/summary.md`
+- `policy_bundle/policy.yaml`
+- `evidence/` directory
+
+Manifest/hashing overview:
+- Each file (except `manifest.json`) is hashed with SHA-256.
+- Manifest includes run metadata (`run_id`, `created_at_utc`, `git_commit`, `policy_path`).
+- Manifest records file `path`, `sha256`, and `size_bytes`.
+
+## CI behavior
+
+PR CI is defined in `.github/workflows/verify.yml` and currently runs:
+- Python 3.11 setup
+- dependency install (`requirements-dev.txt` + editable CLI install)
+- `make verify` (pre-commit + tests)
+
+## Gate extension guide
+
+To add a new gate:
+1. Implement gate class in `packages/gates/registry.py` (subclass `Gate`, define `id`, implement `run`).
+2. Register the gate in `GATE_REGISTRY`.
+3. Add baseline policy entry in `policies/bundles/baseline/policy.yaml` if it should run by default.
+4. Document config keys in:
+   - `policies/SCHEMA.md`
+   - `spec/GATES.md`
+5. Add tests under `apps/cli/tests/` for pass/fail/determinism and regression expectations.
 
 ---
 
