@@ -34,9 +34,9 @@
    - Complete vibeguard audit-pack command behavior and UX.
 16. #17 CLI: add vibeguard init
    - Add init command for project bootstrap.
-17. #18 CI: run vibeguard on PRs
+17. #18 ✅ CI: run vibeguard on PRs (PR #<num>)
    - Run VibeGuard checks in PR CI workflows.
-18. #19 Add release versioning
+18. #19 ✅ Add release versioning (PR #<num>)
    - Define automated release/versioning mechanics.
 19. #20 Wizard spec-to-policy compiler
    - Compile wizard specs into policy bundles.

@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from packages.core.version import __version__
 from packages.reporting.findings import FindingsReport
 
 SEVERITY_ORDER = ["critical", "high", "medium", "low"]
@@ -135,7 +136,7 @@ def create_audit_pack(
     *,
     run_id: str | None = None,
     created_at: datetime | None = None,
-    vibeguard_version: str = "0.1.0",
+    vibeguard_version: str = __version__,
 ) -> Path:
     created = created_at or _utc_now()
     git_sha = _git_sha(repo_path)

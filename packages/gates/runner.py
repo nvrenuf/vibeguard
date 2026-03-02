@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from packages.core.policy_loader import PolicyBundle
+from packages.core.version import __version__
 from packages.reporting.findings import Finding, FindingsReport
 
 from .registry import get_gate
@@ -39,4 +40,5 @@ def run_gates(policy: PolicyBundle, repo_path: Path) -> FindingsReport:
         policy_id=policy.id,
         policy_version=policy.version,
         findings=findings,
+        vibeguard_version=__version__,
     )

@@ -11,6 +11,7 @@ class RunMetadata:
     repo: str
     policy_id: str
     policy_version: str
+    vibeguard_version: str
     generated_at: str | None = None
 
 
@@ -47,6 +48,7 @@ class FindingsReport:
         policy_version: str,
         findings: list[Finding] | None = None,
         generated_at: str | None = None,
+        vibeguard_version: str = "0.1.0",
     ) -> FindingsReport:
         normalized_findings = findings or []
         timestamp = generated_at or datetime.now(timezone.utc).isoformat()  # noqa: UP017
@@ -57,6 +59,7 @@ class FindingsReport:
                 policy_id=policy_id,
                 policy_version=policy_version,
                 generated_at=timestamp,
+                vibeguard_version=vibeguard_version,
             ),
             summary=Summary(overall_status=overall_status, total_findings=len(normalized_findings)),
             findings=normalized_findings,

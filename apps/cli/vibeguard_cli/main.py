@@ -4,12 +4,36 @@ import argparse
 import sys
 from pathlib import Path
 
+import typer
 from packages.core.policy_loader import PolicyLoadError, load_policy_bundle
+from packages.core.version import __version__
 from packages.gates.runner import run_gates
 from packages.reporting.audit_pack import create_audit_pack
 
 DEFAULT_POLICY_PATH = Path("policies/bundles/baseline/policy.yaml")
 DEFAULT_AUDIT_OUT_DIR = Path("out/audit-pack")
+
+app = typer.Typer(add_completion=False)
+
+
+def _version_callback(value: bool) -> None:
+    if value:
+        typer.echo(f"vibeguard {__version__}")
+        raise typer.Exit()
+
+
+@app.callback()
+def version_callback(
+    version: bool = typer.Option(
+        False,
+        "--version",
+        callback=_version_callback,
+        is_eager=True,
+        expose_value=False,
+        help="Show VibeGuard version and exit.",
+    ),
+) -> None:
+    return None
 
 
 def _validate_repo(repo: Path) -> None:
@@ -39,6 +63,7 @@ def run_audit_pack(repo: Path, policy: Path, out_dir: Path = DEFAULT_AUDIT_OUT_D
         policy_path=policy,
         findings_report=report,
         out_dir=out_dir,
+        vibeguard_version=__version__,
     )
     print(str(run_dir))
     return 0 if report.summary.overall_status == "pass" else 1
@@ -46,6 +71,7 @@ def run_audit_pack(repo: Path, policy: Path, out_dir: Path = DEFAULT_AUDIT_OUT_D
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="vibeguard", description="VibeGuard CLI")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     sub = parser.add_subparsers(dest="command", required=True)
 
     check_cmd = sub.add_parser("check", help="Run checks")
