@@ -1,0 +1,21 @@
+# VibeGuard wizard compile template (v0.1)
+# Compile with:
+#   vibeguard wizard compile --in wizard/template.yaml --out policies/bundles/generated/policy.yaml
+
+policy_id: wizard-generated
+policy_version: 0.1.0
+description: Policy generated from wizard template
+
+# Paths to include/exclude for gate execution.
+include_paths:
+  - "**"
+exclude_paths:
+  - ".git/**"
+
+# Ordered gate list to include in compiled policy output.
+gate_ids:
+  - VG001
+  - VG002
+  - VG003
+  - VG004
+  - VG005

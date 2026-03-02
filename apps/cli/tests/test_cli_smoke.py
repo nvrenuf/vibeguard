@@ -27,6 +27,12 @@ def test_init_help() -> None:
     assert exc.value.code == 0
 
 
+def test_wizard_help() -> None:
+    with pytest.raises(SystemExit) as exc:
+        main(["wizard", "--help"])
+    assert exc.value.code == 0
+
+
 def test_check_returns_non_zero_when_required_file_missing(tmp_path) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()

@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 
 from packages.core.policy_loader import PolicyLoadError, load_policy_bundle
+from packages.core.wizard_compile import WizardCompileError, compile_wizard_to_policy
 from packages.gates.runner import run_gates
 from packages.reporting.audit_pack import create_audit_pack
 
@@ -186,6 +187,12 @@ def run_init(target_dir: Path, *, force: bool = False) -> int:
     return 0
 
 
+def run_wizard_compile(in_path: Path, out_path: Path) -> int:
+    compiled = compile_wizard_to_policy(in_path=in_path, out_path=out_path)
+    print(str(compiled))
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="vibeguard", description="VibeGuard CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -224,6 +231,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Overwrite generated files if they already exist.",
     )
+
+    wizard_cmd = sub.add_parser("wizard", help="Wizard tooling")
+    wizard_sub = wizard_cmd.add_subparsers(dest="wizard_command", required=True)
+    wizard_compile = wizard_sub.add_parser("compile", help="Compile wizard YAML to policy YAML")
+    wizard_compile.add_argument("--in", dest="in_path", type=Path, required=True)
+    wizard_compile.add_argument("--out", dest="out_path", type=Path, required=True)
     return parser
 
 
@@ -248,7 +261,9 @@ def main(argv: list[str] | None = None) -> int:
             )
         if args.command == "init":
             return run_init(target_dir=args.target, force=args.force)
-    except (PolicyLoadError, ValueError) as exc:
+        if args.command == "wizard" and args.wizard_command == "compile":
+            return run_wizard_compile(in_path=args.in_path, out_path=args.out_path)
+    except (PolicyLoadError, WizardCompileError, ValueError) as exc:
         parser.error(str(exc))
     return 0
 

@@ -1,6 +1,7 @@
-# VibeGuard Wizard (Spec Generator)
+# VibeGuard Wizard (Spec + Policy Compile)
 
-The wizard creates structured constraints **before** an agent writes code.
+The wizard defines structured constraints **before** an agent writes code, and can compile
+those constraints into a policy bundle.
 
 ## Inputs
 - Problem statement / desired outcome
@@ -9,11 +10,28 @@ The wizard creates structured constraints **before** an agent writes code.
 - Risk level (low/med/high)
 - Required approvers
 - Additional acceptance criteria
+- Gate selection (`gate_ids`) for compiled policy output
 
 ## Outputs
-- Issue-level spec file in `SPECS/ISSUE-###-*.md` (or a standalone spec when not tied to GitHub issues)
-- A machine-readable constraints file (future): `spec/instances/<id>.json`
+- Issue-level spec file in `SPECS/ISSUE-###-*.md` (or standalone spec)
+- Wizard YAML input (`wizard/template.yaml`)
+- Compiled policy YAML/JSON at a chosen path (for gate runner use)
 
-## v0 approach
-- Use GitHub issue template + spec file as the wizard output.
-- Add a structured “Scope + Data + Risk” block to the spec template.
+## CLI compile flow (v0.1)
+Compile wizard template to a policy bundle:
+
+```bash
+vibeguard wizard compile --in wizard/template.yaml --out policies/bundles/generated/policy.yaml
+```
+
+Compile behavior:
+- fail closed on invalid wizard schema
+- emit deterministic policy output ordering
+- validate generated policy with the existing policy loader/schema
+
+Required wizard fields:
+- `policy_id` (string)
+- `policy_version` (string)
+- `description` (string)
+- `gate_ids` (non-empty list of strings)
+- optional: `include_paths`, `exclude_paths` (list of strings)
