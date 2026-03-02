@@ -1,50 +1,73 @@
-bundle_id: baseline
-version: "0.1.0"
-description: "Baseline gates for VibeGuard v0"
-gates:
-  repo.required_files:
-    enabled: true
-    required:
-      - "REPO_CONTRACT.md"
-      - "AI_CODING_RULES.md"
-      - "ARCHITECTURE.md"
-      - "ACCEPTANCE_CRITERIA.md"
-      - "spec/VIBEGUARD_CORE.md"
-  repo.forbid_top_level_dirs:
-    enabled: true
-    allowed_top_level:
-      - "apps"
-      - "packages"
-      - "policies"
-      - "audit-pack"
-      - "spec"
-      - "SPECS"
-      - "docs"
-      - "tools"
-      - ".github"
-      - ".gitignore"
-      - "Makefile"
-      - "README.md"
-      - "CHANGELOG.md"
-      - "SECURITY.md"
-      - "THREAT_MODEL.md"
-      - "DEPENDENCY_POLICY.md"
-      - "DEVELOPMENT.md"
-      - "DEPLOYMENT.md"
-      - "OBSERVABILITY.md"
-      - "CODEOWNERS"
-      - "ACCEPTANCE_CRITERIA.md"
-      - "REPO_CONTRACT.md"
-      - "AI_CODING_RULES.md"
-  scope.allowed_paths:
-    enabled: false
-    allowed:
-      - "apps/"
-      - "packages/"
-  deps.policy:
-    enabled: false
-    deny_licenses: []
-    allow_packages: []
-  secrets.scan:
-    enabled: false
-    tool: "gitleaks"
+{
+  "id": "baseline",
+  "version": "0.1.0",
+  "description": "Baseline gates for VibeGuard v0",
+  "gates": [
+    {
+      "id": "repo.required_files",
+      "enabled": true,
+      "config": {
+        "required": [
+          "REPO_CONTRACT.md",
+          "AI_CODING_RULES.md",
+          "ARCHITECTURE.md",
+          "ACCEPTANCE_CRITERIA.md",
+          "spec/VIBEGUARD_CORE.md"
+        ]
+      }
+    },
+    {
+      "id": "repo.forbid_top_level_dirs",
+      "enabled": true,
+      "config": {
+        "allowed_top_level": [
+          "apps",
+          "packages",
+          "policies",
+          "audit-pack",
+          "spec",
+          "SPECS",
+          "docs",
+          "tools",
+          ".github",
+          ".gitignore",
+          "Makefile",
+          "README.md",
+          "CHANGELOG.md",
+          "SECURITY.md",
+          "THREAT_MODEL.md",
+          "DEPENDENCY_POLICY.md",
+          "DEVELOPMENT.md",
+          "DEPLOYMENT.md",
+          "OBSERVABILITY.md",
+          "CODEOWNERS",
+          "ACCEPTANCE_CRITERIA.md",
+          "REPO_CONTRACT.md",
+          "AI_CODING_RULES.md"
+        ]
+      }
+    },
+    {
+      "id": "scope.allowed_paths",
+      "enabled": false,
+      "config": {
+        "allowed": ["apps/", "packages/"]
+      }
+    },
+    {
+      "id": "deps.policy",
+      "enabled": false,
+      "config": {
+        "deny_licenses": [],
+        "allow_packages": []
+      }
+    },
+    {
+      "id": "secrets.scan",
+      "enabled": false,
+      "config": {
+        "tool": "gitleaks"
+      }
+    }
+  ]
+}

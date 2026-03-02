@@ -9,7 +9,7 @@ dependencies = [
 ]
 
 [project.scripts]
-vibeguard = "vibeguard_cli.main:app"
+vibeguard = "vibeguard_cli.main:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -1,102 +1,90 @@
 from __future__ import annotations
 
-import json
+import argparse
+import sys
 from pathlib import Path
-from typing import Annotated, Optional
 
-import typer
-
-app = typer.Typer(no_args_is_help=True)
+from packages.core.policy_loader import PolicyLoadError, load_policy_bundle
+from packages.reporting.findings import FindingsReport
 
 DEFAULT_POLICY_PATH = Path("policies/bundles/baseline/policy.yaml")
 DEFAULT_AUDIT_OUT_DIR = Path("out/audit-pack")
 
 
-@app.command()
-def check(
-    repo: Annotated[Path, typer.Argument(help="Path to the repo to check")],
-    policy: Annotated[
-        Path,
-        typer.Option(
-            "--policy",
-            help="Path to the policy bundle YAML",
-        ),
-    ] = DEFAULT_POLICY_PATH,
-    out: Annotated[
-        Optional[Path],  # noqa: UP007 - Typer parser in this stack rejects `Path | None`
-        typer.Option(
-            "--out",
-            help="Write findings JSON to this path (defaults to stdout)",
-        ),
-    ] = None,
-) -> None:
-    """
-    Run VibeGuard checks against a repository path using a policy bundle.
-    """
+def _validate_repo(repo: Path) -> None:
     if not repo.exists() or not repo.is_dir():
-        raise typer.BadParameter("repo must be an existing directory")
+        raise ValueError("repo must be an existing directory")
 
-    if not policy.exists() or not policy.is_file():
-        raise typer.BadParameter("policy must be an existing file")
 
-    findings = {
-        "overall_status": "pass",
-        "repo": str(repo),
-        "policy": str(policy),
-        "findings": [],
-    }
-
-    payload = json.dumps(findings, indent=2)
-
+def run_check(repo: Path, policy: Path, out: Path | None = None) -> int:
+    _validate_repo(repo)
+    policy_bundle = load_policy_bundle(policy)
+    report = FindingsReport.create(
+        repo=str(repo),
+        policy_id=policy_bundle.id,
+        policy_version=policy_bundle.version,
+        findings=[],
+    )
+    payload = report.to_json()
     if out:
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(payload, encoding="utf-8")
     else:
-        typer.echo(payload)
+        print(payload)
+    return 0
 
 
-@app.command()
-def audit_pack(
-    repo: Annotated[Path, typer.Argument(help="Path to the repo to package")],
-    policy: Annotated[
-        Path,
-        typer.Option(
-            "--policy",
-            help="Path to the policy bundle YAML",
-        ),
-    ] = DEFAULT_POLICY_PATH,
-    out_dir: Annotated[
-        Path,
-        typer.Option(
-            "--out-dir",
-            help="Output directory for the audit pack",
-        ),
-    ] = DEFAULT_AUDIT_OUT_DIR,
-) -> None:
-    """
-    Create an audit-pack folder with stub artifacts (to be replaced by real outputs).
-    """
-    if not repo.exists() or not repo.is_dir():
-        raise typer.BadParameter("repo must be an existing directory")
-
-    if not policy.exists() or not policy.is_file():
-        raise typer.BadParameter("policy must be an existing file")
+def run_audit_pack(repo: Path, policy: Path, out_dir: Path = DEFAULT_AUDIT_OUT_DIR) -> int:
+    _validate_repo(repo)
+    policy_bundle = load_policy_bundle(policy)
 
     (out_dir / "reports").mkdir(parents=True, exist_ok=True)
     (out_dir / "evidence").mkdir(parents=True, exist_ok=True)
 
-    (out_dir / "reports" / "findings.json").write_text(
-        json.dumps({"overall_status": "pass"}, indent=2),
-        encoding="utf-8",
+    report = FindingsReport.create(
+        repo=str(repo),
+        policy_id=policy_bundle.id,
+        policy_version=policy_bundle.version,
+        findings=[],
     )
 
+    (out_dir / "reports" / "findings.json").write_text(report.to_json(), encoding="utf-8")
     (out_dir / "reports" / "summary.md").write_text(
         "# VibeGuard Audit Pack\n\nStub.\n",
         encoding="utf-8",
     )
+    print(str(out_dir))
+    return 0
 
-    typer.echo(str(out_dir))
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(prog="vibeguard", description="VibeGuard CLI")
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    check_cmd = sub.add_parser("check", help="Run checks")
+    check_cmd.add_argument("repo", type=Path)
+    check_cmd.add_argument("--policy", type=Path, default=DEFAULT_POLICY_PATH)
+    check_cmd.add_argument("--out", type=Path, default=None)
+
+    audit_cmd = sub.add_parser("audit-pack", help="Create audit pack")
+    audit_cmd.add_argument("repo", type=Path)
+    audit_cmd.add_argument("--policy", type=Path, default=DEFAULT_POLICY_PATH)
+    audit_cmd.add_argument("--out-dir", type=Path, default=DEFAULT_AUDIT_OUT_DIR)
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = build_parser()
+    args = parser.parse_args(argv)
+    try:
+        if args.command == "check":
+            return run_check(repo=args.repo, policy=args.policy, out=args.out)
+        if args.command == "audit-pack":
+            return run_audit_pack(repo=args.repo, policy=args.policy, out_dir=args.out_dir)
+    except (PolicyLoadError, ValueError) as exc:
+        parser.error(str(exc))
+    return 0
 
 
 if __name__ == "__main__":
-    app()
+    raise SystemExit(main(sys.argv[1:]))
