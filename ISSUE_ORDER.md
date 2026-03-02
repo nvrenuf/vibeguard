@@ -46,3 +46,26 @@
    - Add hardening checks for agentic threat-model risk.
 22. #23 ✅ Logging + redaction policy (PR #39)
    - Define and enforce logging/redaction policy.
+
+## v0.2 backlog
+
+**Milestone:** `v0.2`
+
+1. #41 v0.2: SOC2 baseline policy bundle + strict bundle
+   - Productize policy packs with baseline and strict compliance-oriented defaults.
+2. #42 v0.2: Audit pack verify/sign
+   - Add integrity verification/signing workflow for audit-pack outputs.
+3. #43 v0.2: Policy bundle discovery + selection
+   - Improve multi-bundle discovery and deterministic policy selection UX.
+4. #44 v0.2: Secret scan improvements (entropy + allowlist UX)
+   - Improve VG003 signal quality with entropy checks and better suppression ergonomics.
+5. #45 v0.2: License/dependency gate improvements
+   - Expand dependency/license checks with stronger SPDX-aware behavior.
+6. #46 v0.2: Scan caching / incremental mode
+   - Reduce scan runtime by skipping unchanged files safely.
+7. #47 v0.2: CLI summary UX improvements
+   - Add clearer human-readable CLI summary output without breaking machine formats.
+8. #48 v0.2: vibeguard.yaml config support
+   - Support repo-level defaults via an optional `vibeguard.yaml` config file.
+9. #49 v0.2: Publish a reusable GitHub Action
+   - Package VibeGuard as a reusable action for adoption in external repos.
