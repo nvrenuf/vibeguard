@@ -2,9 +2,9 @@
 
 **Milestone:** `v0.1`
 
-1. #2 ✅ Freeze v0.1 scope and definitions (PR TBD)
+1. #2 ✅ Freeze v0.1 scope and definitions (PR #37)
    - Lock scope boundaries and shared definitions for v0.1 delivery.
-2. #3 ✅ Single canonical “VibeGuard Core” flow doc (PR TBD)
+2. #3 ✅ Single canonical “VibeGuard Core” flow doc (PR #37)
    - Publish one canonical end-to-end Core flow for implementers.
 3. #4 ✅ Implement policy bundle loader (PR #24)
    - Add deterministic policy bundle loading behavior.
