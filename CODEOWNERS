@@ -1,0 +1,6 @@
+# Code owners (edit to match your org/team structure)
+# Examples:
+# /security/        @security-team
+# /.github/workflows/ @devsecops-team
+# /SPECS/           @tech-leads
+* @devsecops-team
