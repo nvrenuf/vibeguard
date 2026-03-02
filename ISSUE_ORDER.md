@@ -67,5 +67,5 @@
    - Add clearer human-readable CLI summary output without breaking machine formats.
 8. #48 v0.2: vibeguard.yaml config support
    - Support repo-level defaults via an optional `vibeguard.yaml` config file.
-9. #49 v0.2: Publish a reusable GitHub Action
+9. #49 ✅ v0.2: Publish a reusable GitHub Action (PR #TBD)
    - Package VibeGuard as a reusable action for adoption in external repos.

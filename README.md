@@ -154,6 +154,8 @@ Manifest/hashing overview:
 ## CI behavior
 
 PR CI is defined in `.github/workflows/verify.yml` and currently runs:
+GitHub Action usage docs for external repos: [`docs/GITHUB_ACTION.md`](docs/GITHUB_ACTION.md).
+
 - Python 3.11 setup
 - dependency install (`requirements-dev.txt` + editable CLI install)
 - `make verify` (pre-commit + tests)
