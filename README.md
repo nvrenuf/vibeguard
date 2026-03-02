@@ -18,6 +18,13 @@ It sits between “AI wrote some code” and “we shipped it” and enforces:
 6) **Deploy**
 7) **Export Audit Pack**
 
+Flow contract for v0.1:
+- Wizard definition constrains allowed repo/data change scope.
+- Code Agent produces code/doc changes under that contract.
+- Gates run deterministically and emit machine-readable findings.
+- Approval is a human checkpoint for merge/deploy.
+- Audit Pack captures evidence (findings + manifest + policy snapshot).
+
 This repo is the **single source of truth** for the VibeGuard product: specs, policies, gates engine, and audit pack format.
 
 ---
@@ -49,6 +56,27 @@ Run the CLI (skeleton):
 ```bash
 vibeguard --help
 ```
+
+## CLI commands (v0.1)
+
+`vibeguard check <repo>`
+- `--policy <path>` policy bundle path (default baseline policy)
+- `--out <path>` write output to file (default stdout)
+- `--fail-on low|medium|high|critical` severity threshold for non-zero exit
+- `--format json|sarif` output format (SARIF supported for integrations)
+
+`vibeguard audit-pack <repo>`
+- `--policy <path>`
+- `--out-dir <path>`
+- `--force-pack` always exit 0 after writing pack, even when findings fail
+
+`vibeguard init [target]`
+- scaffolds baseline policy and recommended output folders
+- `--force` overwrites generated policy file when present
+
+Versioning in v0.1:
+- reports and policy metadata carry `policy_version`
+- release-process hardening beyond this is tracked in roadmap post-v0.1
 
 ---
 
