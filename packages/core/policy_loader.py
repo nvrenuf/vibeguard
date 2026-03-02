@@ -10,6 +10,8 @@ from typing import Any
 class GateConfig:
     id: str
     enabled: bool = True
+    include_paths: list[str] | None = None
+    exclude_paths: list[str] | None = None
     config: dict[str, Any] = field(default_factory=dict)
 
 
@@ -19,6 +21,8 @@ class PolicyBundle:
     version: str
     description: str
     gates: list[GateConfig]
+    include_paths: list[str] | None = None
+    exclude_paths: list[str] | None = None
 
 
 class PolicyLoadError(ValueError):
@@ -52,12 +56,38 @@ def _parse_gate(item: Any, idx: int) -> GateConfig:
         raise PolicyLoadError(
             f"policy schema validation failed: gates[{idx}].enabled must be a boolean",
         )
+    include_paths = _optional_str_list(item, "include_paths", f"gates[{idx}].include_paths")
+    exclude_paths = _optional_str_list(item, "exclude_paths", f"gates[{idx}].exclude_paths")
     config = item.get("config", {})
     if not isinstance(config, dict):
         raise PolicyLoadError(
             f"policy schema validation failed: gates[{idx}].config must be an object",
         )
-    return GateConfig(id=gate_id, enabled=enabled, config=config)
+    return GateConfig(
+        id=gate_id,
+        enabled=enabled,
+        include_paths=include_paths,
+        exclude_paths=exclude_paths,
+        config=config,
+    )
+
+
+def _optional_str_list(
+    data: dict[str, Any],
+    key: str,
+    label: str | None = None,
+) -> list[str] | None:
+    value = data.get(key)
+    if value is None:
+        return None
+    if not isinstance(value, list) or any(
+        not isinstance(item, str) or not item for item in value
+    ):
+        raise PolicyLoadError(
+            "policy schema validation failed: "
+            f"'{label or key}' must be a list of non-empty strings",
+        )
+    return value
 
 
 def load_policy_bundle(path: Path) -> PolicyBundle:
@@ -81,5 +111,7 @@ def load_policy_bundle(path: Path) -> PolicyBundle:
         id=_require_str(data, "id"),
         version=_require_str(data, "version"),
         description=_require_str(data, "description"),
+        include_paths=_optional_str_list(data, "include_paths"),
+        exclude_paths=_optional_str_list(data, "exclude_paths"),
         gates=[_parse_gate(item, idx) for idx, item in enumerate(gates)],
     )

@@ -1,15 +1,23 @@
 # Policy Bundle Schema (v0)
 
-This repo uses simple YAML policy bundles in `policies/bundles/*`.
+Policy bundles are JSON-formatted files stored under `policies/bundles/*`.
 
 ## Required keys
-- `bundle_id` (string)
+- `id` (string)
 - `version` (string)
-- `gates` (map of gate_id -> config)
-- `thresholds` (optional)
+- `description` (string)
+- `gates` (non-empty list)
 
-## Gate config (common)
-- `enabled` (bool)
-- `severity_fail` (list of severities that fail the run: [high, critical] etc)
+## Optional global scope
+- `include_paths: list[str]` glob patterns to include
+- `exclude_paths: list[str]` glob patterns to exclude
+
+## Gate entry schema
+Each gate entry supports:
+- `id` (string)
+- `enabled` (bool, default `true`)
+- `config` (object)
+- `include_paths: list[str]` (optional, overrides global for this gate)
+- `exclude_paths: list[str]` (optional, overrides global for this gate)
 
 See: `policies/bundles/baseline/policy.yaml`.
