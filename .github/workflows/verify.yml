@@ -8,6 +8,7 @@ on:
 env:
   PRE_COMMIT_HOME: ${{ github.workspace }}/.pc-home
   TMPDIR: /tmp
+  PYTHONPATH: ${{ github.workspace }}:${{ github.workspace }}/apps/cli
 
 jobs:
   verify:
