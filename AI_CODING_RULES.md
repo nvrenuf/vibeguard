@@ -1,14 +1,21 @@
 # AI Coding Rules (Codex / Claude Code)
 
-These rules exist to keep AI-assisted output production-grade.
+These rules exist to keep AI-assisted output production-grade **and** aligned with VibeGuard’s guardrailing mission.
 
 ## Repository structure discipline
 - Do not add new top-level directories without approval.
-- Keep changes within existing module boundaries described in `ARCHITECTURE.md`.
+- Keep changes within module boundaries described in `ARCHITECTURE.md`.
 - Prefer small, reviewable PRs; one issue → one PR whenever possible.
+- Update `ARCHITECTURE.md` and relevant `spec/*` docs when changing boundaries or runtime flows.
+
+## Determinism and safety (VibeGuard-specific)
+- Gates must be **deterministic** (same inputs → same outputs).
+- Default: **no network access** from gates. If a future gate needs network, it must be explicitly policy-enabled and documented as a trust boundary.
+- Fail closed: if a gate cannot run reliably, the overall result is failure.
+- Findings must include actionable evidence (file paths, lines, or command output references) without leaking secrets.
 
 ## Secure-by-default requirements
-- Validate all external inputs (HTTP, CLI, message queues, webhooks).
+- Validate all external inputs (CLI args, file paths, YAML/JSON policy files).
 - Use allowlists where possible; sanitize and normalize inputs.
 - Use timeouts and retries for outbound calls; never infinite waits.
 - Avoid logging secrets, tokens, credentials, or sensitive payloads.
@@ -16,30 +23,12 @@ These rules exist to keep AI-assisted output production-grade.
 
 ## Dependencies
 - Prefer standard library over new packages.
-- New dependencies must be:
-  - pinned (exact or narrow range)
-  - justified in the PR and referenced in the spec
-  - vetted for maintenance/security history
-- Do not introduce “toolchain sprawl” (multiple linters/test frameworks without justification).
+- New dependencies must be justified in the spec and documented in `DEPENDENCY_POLICY.md`.
+- Never add dependencies that expand attack surface unnecessarily (e.g., unmaintained parsing libs) without security review.
 
-## Error handling
-- Fail closed on security checks.
-- Use typed/structured errors where appropriate.
-- Do not swallow exceptions silently.
-- Include actionable error messages (but never secret material).
+## Output requirements for AI-generated work
+All AI-driven work must follow: **Plan → Patch → Verify** (see `REPO_CONTRACT.md`).
 
-## Testing
-- Any behavior change requires tests.
-- Bug fixes require regression tests.
-- Security controls require tests where feasible (authz checks, input validation).
-
-## Documentation
-- If a change affects how to run, configure, deploy, or secure the system:
-  - update `DEVELOPMENT.md`, `DEPLOYMENT.md`, `SECURITY.md`, and/or `OBSERVABILITY.md` accordingly.
-
-## No slop rules (explicit)
-- No commented-out code in final output.
-- No placeholder implementations returning “mock” values.
-- No “MVP shortcuts” in production paths.
-- No unexplained magic numbers.
-- Prefer clarity over cleverness.
+Verification minimum:
+- `make verify`
+- relevant unit tests (pytest) for new logic

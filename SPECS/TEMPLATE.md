@@ -1,43 +1,46 @@
-# Feature Specification Template
+# Spec: ISSUE-### — <Title>
 
-## Summary (1–3 sentences)
-What is being built and why?
+## Summary
+One paragraph describing the change.
 
-## Problem / Outcome
-Describe the user/system outcome. Keep it concrete.
+## Wizard constraints (required)
+### Scope (paths allowed to change)
+- Allowed:
+  - `...`
+- Not allowed:
+  - `...`
 
-## Scope (in)
-- Bullet list of included behaviors.
+### Data + systems boundaries
+- Allowed data/systems:
+  - `...`
+- Explicitly forbidden:
+  - `...`
 
-## Non-goals (out)
-- Bullet list of excluded behaviors (prevents scope creep).
+### Risk level
+- Low / Medium / High: **<choose one>**
+- Rationale:
+
+### Required approvers (if Medium/High)
+- `@...`
+- `@...`
 
 ## Requirements
-- R1:
-- R2:
-- R3:
+- [ ] ...
 
-## Interfaces / Contracts
-- APIs, CLI, events, schemas, configs.
+## Non-goals
+- ...
 
-## Data handling
-- Data classification (public/internal/sensitive)
-- Storage or retention changes
-- Logging constraints
+## Acceptance criteria
+- [ ] ...
 
-## Security considerations
-- Authn/Authz impact
-- Input validation
-- Audit logging needs
-- Threat model impact (yes/no + why)
+## Security notes
+- Threat model impact (if any):
+- Audit pack implications (if any):
 
-## Testing expectations
-- Unit tests:
-- Integration tests:
-- Regression tests:
+## Implementation plan (high level)
+- ...
 
-## Acceptance criteria (checkboxes)
-- [ ] Functional requirements met
-- [ ] Tests added/updated
-- [ ] `make verify` passes
-- [ ] Docs updated if needed
+## Verification
+- `make verify`
+- tests:
+  - ...

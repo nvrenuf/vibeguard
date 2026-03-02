@@ -2,34 +2,47 @@
 
 **Milestone:** `v0.1`
 
-> This file is the canonical ordered execution list for VibeGuard v0.1.
-> It must mirror GitHub issues in both order and issue numbers.
->
-> In this environment, `gh` was not available (`command not found`).
-> Run the exact commands in `tools/create_v01_backlog.sh` from a machine with GitHub CLI installed and authenticated.
-> The script creates labels, ensures the `v0.1` milestone, creates all issues in order, and rewrites this file with the real GitHub issue numbers.
-
-## Planned order (titles fixed)
-
-1. Freeze v0.1 scope and definitions
-2. Single canonical “VibeGuard Core” flow doc
-3. Implement policy bundle loader
-4. Implement policy schema validation
-5. Add policy bundle versioning + metadata
-6. Define canonical Findings JSON format
-7. Add SARIF output option
-8. Implement gate runner framework
-9. Implement baseline gates (VG001-VG005)
-10. Implement scope filters for gates
-11. Implement audit pack directory structure
-12. Manifest + hashing
-13. Environment + toolchain metadata capture
-14. CLI: implement vibeguard check fully
-15. CLI: implement vibeguard audit-pack fully
-16. CLI: add vibeguard init
-17. CI: run vibeguard on PRs
-18. Add release versioning
-19. Wizard spec-to-policy compiler
-20. Wizard template + docs
-21. Add threat model checks for agentic risk
-22. Logging + redaction policy
+1. #2 Freeze v0.1 scope and definitions
+   - Lock scope boundaries and shared definitions for v0.1 delivery.
+2. #3 Single canonical “VibeGuard Core” flow doc
+   - Publish one canonical end-to-end Core flow for implementers.
+3. #4 Implement policy bundle loader
+   - Add deterministic policy bundle loading behavior.
+4. #5 Implement policy schema validation
+   - Validate policy bundles against the canonical schema.
+5. #6 Add policy bundle versioning + metadata
+   - Require version/provenance metadata in policy bundles.
+6. #7 Define canonical Findings JSON format
+   - Standardize Findings JSON schema for all outputs.
+7. #8 Add SARIF output option
+   - Provide SARIF as an alternate findings export.
+8. #9 Implement gate runner framework
+   - Create gate execution and aggregation framework.
+9. #10 Implement baseline gates (VG001-VG005)
+   - Implement baseline gate set VG001-VG005.
+10. #11 Implement scope filters for gates
+   - Support include/exclude scope filters for gate runs.
+11. #12 Implement audit pack directory structure
+   - Define canonical audit-pack directory layout.
+12. #13 Manifest + hashing
+   - Add manifest generation and file hashing.
+13. #14 Environment + toolchain metadata capture
+   - Capture environment/toolchain metadata in audit packs.
+14. #15 CLI: implement vibeguard check fully
+   - Complete vibeguard check command behavior and UX.
+15. #16 CLI: implement vibeguard audit-pack fully
+   - Complete vibeguard audit-pack command behavior and UX.
+16. #17 CLI: add vibeguard init
+   - Add init command for project bootstrap.
+17. #18 CI: run vibeguard on PRs
+   - Run VibeGuard checks in PR CI workflows.
+18. #19 Add release versioning
+   - Define automated release/versioning mechanics.
+19. #20 Wizard spec-to-policy compiler
+   - Compile wizard specs into policy bundles.
+20. #21 Wizard template + docs
+   - Ship wizard templates and authoring docs.
+21. #22 Add threat model checks for agentic risk
+   - Add hardening checks for agentic threat-model risk.
+22. #23 Logging + redaction policy
+   - Define and enforce logging/redaction policy.

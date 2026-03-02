@@ -2,23 +2,25 @@
 
 ## Prerequisites
 - Git
-- Python 3.11+ (for `pre-commit` tooling used by `make verify`)
-- Optional: Node / Go / etc. depending on your project stack
+- Python 3.11+
+
+## Setup
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+pip install -e apps/cli
+pre-commit install
+```
 
 ## Standard commands
-- `make verify` — required repo-wide quality checks (format/lint/security hooks)
-- Add project-specific commands here (tests, typecheck, etc.)
+- `make verify` — pre-commit + tests
+- `pytest -q` — tests only
+- `vibeguard --help` — CLI help
 
-## Local setup
-1) Create a virtualenv (recommended):
-   - `python -m venv .venv`
-   - `source .venv/bin/activate`
-2) Install tooling:
-   - `pip install -r requirements-dev.txt`
-3) Install hooks:
-   - `pre-commit install`
-
-## Adding language-specific checks
-As the project is implemented, update:
-- `Makefile` targets (`test`, `typecheck`, etc.)
-- `.pre-commit-config.yaml` hooks as needed
+## Adding a new gate (v0 rules)
+1) Create a spec in `SPECS/` first.
+2) Implement deterministic logic in `packages/gates/`.
+3) Add unit tests.
+4) Update baseline policy bundle if the gate is enabled by default.
+5) Update `spec/GATES.md` if the output contract changes.

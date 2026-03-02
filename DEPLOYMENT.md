@@ -1,20 +1,13 @@
 # Deployment Guide
 
-This template is deployment-agnostic. Fill in your actual deployment model.
+## v0
+VibeGuard is a local-first CLI. “Deployment” is:
+- publishing a versioned package (future)
+- running in CI via GitHub Actions
 
-## Supported modes (examples)
-- Local Docker Compose
-- Kubernetes
-- AWS ECS/Fargate
-- Bare metal
+## CI usage (baseline)
+- Install dependencies
+- Run `make verify`
+- (Phase 3) Run `vibeguard check` with a pinned policy bundle
 
-## Minimum requirements
-- Secrets injected via environment or secret manager
-- Immutable builds and reproducible deploys
-- CI must produce build artifacts or images
-
-## Deployment checklist (minimum)
-- [ ] Configuration documented
-- [ ] Secrets managed correctly
-- [ ] Observability configured (logs/metrics)
-- [ ] Rollback strategy defined
+See `.github/workflows/verify.yml`.

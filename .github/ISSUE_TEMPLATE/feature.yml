@@ -1,0 +1,18 @@
+name: Feature
+description: Propose a new feature for VibeGuard
+labels: ["needs-spec"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What should VibeGuard do?
+    validations:
+      required: true
+  - type: textarea
+    id: wizard
+    attributes:
+      label: Wizard constraints (Scope / Data / Risk)
+      description: Include allowed paths, forbidden paths, data boundaries, risk level, required approvers.
+    validations:
+      required: true

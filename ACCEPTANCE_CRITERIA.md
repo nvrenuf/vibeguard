@@ -29,3 +29,8 @@ A change may be merged only when all applicable criteria are met.
 - [ ] `DEPLOYMENT.md` updated if deploy/runtime changes
 - [ ] `SECURITY.md` updated if security posture changes
 - [ ] `OBSERVABILITY.md` updated if logging/metrics/tracing changes
+
+## VibeGuard-specific (when applicable)
+- [ ] Policy bundle changes include schema + baseline updates
+- [ ] Gate changes include unit tests + deterministic output
+- [ ] Audit pack format changes update `audit-pack/` templates and `spec/AUDIT_PACK.md`

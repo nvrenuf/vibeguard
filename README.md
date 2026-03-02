@@ -1,32 +1,71 @@
-# Production Repository Template — AI-Assisted Development (Codex / Claude Code)
+# VibeGuard
 
-This repository is a **production-grade scaffold** designed to eliminate “slop” when using AI coding tools.
-It enforces: **persistent requirements**, **repeatable verification**, **security defaults**, and **CI gates**.
+VibeGuard is a **guardrailed vibe-coding** control plane for teams.
 
-## How to use
+It sits between “AI wrote some code” and “we shipped it” and enforces:
+- **Scope + data boundaries** (what the agent is allowed to touch)
+- **Policy gates** (security / compliance / quality checks)
+- **Approval workflow** (human sign-off for risky changes)
+- **Audit pack export** (evidence bundle for SOC 2 / internal audit / customers)
 
-### 1) Create a new repo from this template
-- Click **Use this template** in GitHub (or create via your internal repo provisioning).
-- Immediately set branch protection (see `docs/BOOTSTRAP_CHECKLIST.md`).
+## End-to-end flow
 
-### 2) Create work using Issues (source of truth)
-- Use the **Feature** or **Bug** issue templates.
-- Add label `needs-spec` (or your workflow can auto-add it).
+1) **Idea**
+2) **VibeGuard Wizard** (define scope, data, criteria)
+3) **Code Agent** (Codex / Claude / Cursor writes code)
+4) **VibeGuard Gates** run (policy checks + proofs)
+5) **Approval**
+6) **Deploy**
+7) **Export Audit Pack**
 
-### 3) Spec is generated automatically
-- A GitHub Action converts the issue into `SPECS/ISSUE-###-<slug>.md` via a PR.
+This repo is the **single source of truth** for the VibeGuard product: specs, policies, gates engine, and audit pack format.
 
-### 4) Implement via AI with low friction
-- Run `tools/ai/ai-brief.sh 123` to generate the standard “context bundle” prompt to feed Codex/Claude.
-- Or implement manually, but you must follow `REPO_CONTRACT.md`.
+---
 
-## Standard verification
-- `make verify` runs repo-wide quality checks (pre-commit hooks).
-- Language-specific tests should be added as the project grows (document in `DEVELOPMENT.md`).
+## Repository map
 
-## Key files
-- `REPO_CONTRACT.md` — rules for AI-assisted development
-- `AI_CODING_RULES.md` — coding + security standards
-- `ACCEPTANCE_CRITERIA.md` — definition of done
-- `SPECS/` — generated specs per issue (source of truth for features)
-- `.github/workflows/` — CI, spec generation, and policy checks
+- `spec/` — product-level specs (stable, curated)
+- `SPECS/` — issue-level specs (generated / per-change)
+- `policies/` — policy bundles (YAML) that gates evaluate
+- `audit-pack/` — audit pack schema + templates
+- `apps/cli/` — `vibeguard` CLI (v0 interface)
+- `packages/` — core library modules (gates, reporting, connectors)
+- `docs/` — repo/bootstrap docs
+
+## Quickstart (local)
+
+Prereqs: Python 3.11+.
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements-dev.txt
+pip install -e apps/cli
+pre-commit install
+make verify
+```
+
+Run the CLI (skeleton):
+```bash
+vibeguard --help
+```
+
+---
+
+## How work gets done here (Codex-friendly)
+
+Mandatory reading for any AI coding run:
+- `REPO_CONTRACT.md`
+- `AI_CODING_RULES.md`
+- `ARCHITECTURE.md`
+- `ACCEPTANCE_CRITERIA.md`
+- `spec/VIBEGUARD_CORE.md`
+- the relevant spec in `SPECS/`
+
+Use `tools/ai/ai-brief.sh <issue_number>` to print a standardized prompt bundle for Codex/Claude Code.
+
+---
+
+## Roadmap (v0 → v1)
+
+See `spec/ROADMAP.md`.

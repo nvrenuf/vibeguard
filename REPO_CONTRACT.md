@@ -1,4 +1,4 @@
-# Repository Contract — AI-Assisted Development (Production)
+# Repository Contract — AI-Assisted Development (VibeGuard)
 
 This repository uses AI tools (Codex / Claude Code) to accelerate implementation.
 **AI is not allowed to define requirements or architecture**. AI output is treated as untrusted until verified.
@@ -10,6 +10,7 @@ Before generating or modifying code, the AI tool MUST read (or be provided) the 
 - `AI_CODING_RULES.md`
 - `ARCHITECTURE.md`
 - `ACCEPTANCE_CRITERIA.md`
+- `spec/VIBEGUARD_CORE.md`
 - The relevant spec in `SPECS/` (e.g., `SPECS/ISSUE-123-*.md`)
 
 If any of these are missing from context, the AI must stop and request them.
@@ -19,39 +20,29 @@ All AI-driven work must follow this structure.
 
 ### 1) PLAN
 - Identify the spec and restate intended outcome.
-- List files to be changed (and why).
-- Explain approach (high-level).
-- Identify risks (security, data handling, tenancy, backwards compatibility).
-- Identify tests to add/update.
-- Confirm dependency impact (none / list new + justification).
+- List files to be changed.
+- Identify risks and how they will be mitigated.
+- State how you will verify.
 
 ### 2) PATCH
-- Implement code and tests.
-- Keep changes scoped to the spec.
-- Update docs when required by acceptance criteria.
+- Provide the minimal code changes to implement the spec.
+- Keep changes tight and avoid unrelated refactors.
 
 ### 3) VERIFY
-- Run (or instruct to run) verification commands:
-  - `make verify`
-  - plus any project-specific test commands (document in `DEVELOPMENT.md`)
-- Summarize results and fix failures.
-- Confirm:
-  - no secrets added
-  - no insecure defaults introduced
-  - logging is present where required
-  - any new endpoints/actions have authz + audit
+- Run `make verify` and relevant tests.
+- Include output or describe what was run and the result.
 
-## Non-negotiable rules
-- **No architectural changes** unless explicitly authorized in the spec and updated in `ARCHITECTURE.md`.
-- **No copy/paste from external repositories** (patterns may be studied; code must be rewritten).
-- **No hardcoded secrets**. Use env vars + secret management.
-- **No disabling CI/lint/security checks**.
-- **No “temporary” TODO placeholders** in production paths.
-- **Least privilege** for permissions, tokens, APIs, and actions.
-- **Fail closed**: defaults should deny rather than allow.
+## Change management rules
+- Any new gate must include unit tests and a documented output contract.
+- Any policy schema change must include:
+  - schema update
+  - migration notes (if needed)
+  - baseline policy bundle update
+- Any audit pack change must include:
+  - updated `audit-pack/` templates
+  - backward compatibility notes (if breaking)
 
-## Review and merge policy (minimum)
-- No direct pushes to `main`.
-- CI must pass.
-- A reviewer must approve (use CODEOWNERS for sensitive paths).
-- If the change touches security-critical areas, security review is required (see `SECURITY.md` and CODEOWNERS rules).
+## No silent scope creep
+If the spec is unclear or incomplete, the AI must:
+- propose edits to the spec
+- stop implementation until the spec is updated

@@ -31,6 +31,7 @@ echo "- REPO_CONTRACT.md"
 echo "- AI_CODING_RULES.md"
 echo "- ARCHITECTURE.md"
 echo "- ACCEPTANCE_CRITERIA.md"
+echo "- spec/VIBEGUARD_CORE.md"
 echo "- ${SPEC_PATH}"
 echo
 echo "Output format REQUIRED:"

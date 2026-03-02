@@ -1,21 +1,16 @@
-# Observability Standards
+# Observability Standards (VibeGuard)
 
 ## Logging
-- Use structured logging (JSON preferred).
-- Do not log secrets or sensitive payloads.
-- Include correlation IDs for request flows.
+- Prefer structured logs (JSON) for gate execution (v1+).
+- Never log secrets or raw sensitive payloads.
+- Include run ID, gate ID, and policy bundle ID in every record.
 
-## Metrics
-- Define key SLOs (latency, error rate, throughput).
-- Emit metrics for critical operations.
+## Reports
+v0 uses a JSON findings report as the primary “observable” output:
+- machine-readable `findings.json`
+- human-readable `summary.md`
 
-## Tracing (optional)
-- Use distributed tracing where appropriate.
-- Ensure traces do not include sensitive data.
-
-## Audit logs
-Any privileged or security-relevant action must produce an audit log event:
-- who/what performed the action
-- what was changed
-- when
-- result (success/failure)
+## Metrics (future)
+- gate runtime by gate ID
+- finding counts by severity
+- pass/fail rate by policy bundle

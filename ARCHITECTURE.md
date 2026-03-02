@@ -1,28 +1,82 @@
 # Architecture (Living Document)
 
-This document describes the current architecture and must remain accurate.
-Update this file when adding modules, changing boundaries, or changing runtime flows.
+This document describes the architecture of **VibeGuard** and must remain accurate.
 
-## Current state (template)
-- **Domain modules:** (define here)
-- **APIs:** (define endpoints, auth model, major flows)
-- **Data stores:** (define schemas/ownership)
-- **Integrations:** (define external dependencies)
+## What VibeGuard is
+
+VibeGuard is a **policy gate and audit layer** for AI-assisted development.
+It does **not** replace Codex/Claude/Cursor. It wraps them with:
+- a structured “wizard” spec,
+- deterministic checks (“gates”),
+- an approval boundary,
+- and an exportable audit pack.
+
+## Core components
+
+### 1) Wizard (spec + constraints)
+Artifacts produced by the wizard are the **contract** for implementation:
+- scope: what paths / modules / services may be modified
+- data: what datasets/systems may be accessed (if any)
+- criteria: acceptance criteria beyond repo defaults
+- risk classification: low/med/high
+- required approvers
+
+Stored as:
+- product-level spec: `spec/WIZARD.md`
+- issue-level instances: `SPECS/ISSUE-###-*.md`
+
+### 2) Gate runner
+A deterministic engine that:
+- loads a policy bundle (`policies/bundles/...`)
+- evaluates the target workspace (repo checkout)
+- produces a machine-readable findings report
+- can enforce **fail-closed** behavior on disallowed actions
+
+Runtime surfaces (v0):
+- `vibeguard` CLI: `apps/cli/`
+
+### 3) Policy bundles
+Versioned policy definitions (YAML) for:
+- dependency allow/deny (licenses, ecosystems)
+- secrets scanning requirements
+- repo hygiene (required files, required CI)
+- change scope enforcement (paths touched)
+- optional framework mappings (SOC 2, PCI, etc.)
+
+Location: `policies/`
+
+### 4) Audit pack exporter
+Produces an evidence bundle containing:
+- policy bundle version + hashes
+- findings report
+- PR/commit metadata (when integrated)
+- verification outputs
+- attestation / approvals
+
+Schema + templates: `audit-pack/`
 
 ## Trust boundaries
-List where untrusted data enters and how it is validated.
 
-## Security invariants (examples)
-- All external inputs validated.
-- Authz required for state-changing operations.
-- Audit logs for privileged actions.
+- **Untrusted input:** repository contents being checked; PR diffs; user-supplied policy bundles.
+- **Trusted computing base:** VibeGuard gate runner + policies shipped in this repo.
+- **Principle:** *Fail closed* when policy cannot be loaded or a gate cannot execute reliably.
+
+## Security invariants (non-negotiable)
+
+- Gates must be deterministic and reproducible.
+- No gate may exfiltrate repo contents. Default: **no network**.
+- No secrets are logged. Logs are structured and redact sensitive content.
+- Policies are versioned and cryptographically hashed into the audit pack.
+- Approvals are required for high-risk changes (as defined by wizard output).
 
 ## Observability
-- Structured logging required.
-- Correlation IDs for request-level tracing.
+
+- Gate runs emit a structured JSON report (and optional human summary).
+- Every gate run has a run ID, timestamp, policy bundle identifier, and git revision.
 
 ## Change control
+
 Architectural changes require:
-1) A spec that explicitly authorizes the change
-2) An update to this file
-3) Appropriate tests and threat model review
+1) updating this file
+2) updating `spec/ROADMAP.md` if scope changes
+3) a spec in `SPECS/` for the change

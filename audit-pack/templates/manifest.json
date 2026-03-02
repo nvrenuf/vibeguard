@@ -1,0 +1,23 @@
+{
+  "schema_version": "0.1.0",
+  "run_id": "<uuid>",
+  "timestamp_utc": "<iso8601>",
+  "repo": {
+    "path": "<local path>",
+    "git_revision": "<sha or unknown>"
+  },
+  "policy_bundle": {
+    "bundle_id": "<id>",
+    "version": "<version>",
+    "sha256": "<sha256 of policy.yaml>"
+  },
+  "tool": {
+    "name": "vibeguard",
+    "version": "0.1.0"
+  },
+  "results": {
+    "overall_status": "pass|fail|error",
+    "gates_run": 0,
+    "findings_count": 0
+  }
+}
