@@ -42,7 +42,7 @@
    - Compile wizard specs into policy bundles.
 20. #21 ✅ Wizard template + docs (PR #38)
    - Ship wizard templates and authoring docs.
-21. #22 ✅ Add threat model checks for agentic risk (PR TBD)
+21. #22 ✅ Add threat model checks for agentic risk (PR #39)
    - Add hardening checks for agentic threat-model risk.
-22. #23 ✅ Logging + redaction policy (PR TBD)
+22. #23 ✅ Logging + redaction policy (PR #39)
    - Define and enforce logging/redaction policy.
