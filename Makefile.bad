@@ -1,0 +1,18 @@
+PYTHON ?= python3
+
+.PHONY: verify test fmt lint
+
+verify:
+@echo "Running pre-commit checks..."
+@$(PYTHON) -m pre_commit run --all-files
+@echo "Running tests..."
+@$(MAKE) test
+
+test:
+PYTHONPATH=apps/cli:$$PYTHONPATH $(PYTHON) -m pytest -q
+
+fmt:
+$(PYTHON) -m ruff format .
+
+lint:
+$(PYTHON) -m ruff check .

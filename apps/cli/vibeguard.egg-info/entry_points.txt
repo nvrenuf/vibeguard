@@ -1,0 +1,2 @@
+[console_scripts]
+vibeguard = vibeguard_cli.main:app
