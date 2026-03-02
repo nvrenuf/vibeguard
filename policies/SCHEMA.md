@@ -37,3 +37,6 @@ See: `policies/bundles/baseline/policy.yaml`.
   - `notices_paths: list[str]` (default `['THIRD_PARTY_NOTICES.md', 'THIRD_PARTY_NOTICES.txt']`)
 - `VG005`:
   - `required_workflows: list[str]` (default `['.github/workflows/verify.yml']`)
+- `VG006`:
+  - `threat_model_path: str` (default `'THREAT_MODEL.md'`)
+  - `required_sections: list[str]` (default `['Assets', 'Actors', 'Trust boundaries', 'Key threats and mitigations']`)

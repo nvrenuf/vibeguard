@@ -20,3 +20,5 @@ If you believe you found a security issue:
   - an explicit spec
   - threat model update
   - security review
+
+See detailed implementation guidance: `docs/LOGGING_REDACTION.md`.

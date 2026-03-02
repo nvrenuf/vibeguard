@@ -84,6 +84,31 @@ Example:
 }
 ```
 
+### VG006 — Threat Model Structure
+Checks that the threat model document exists and includes required section headings.
+
+Config:
+- `threat_model_path: str` (default `'THREAT_MODEL.md'`)
+- `required_sections: list[str]`
+  default: `['Assets', 'Actors', 'Trust boundaries', 'Key threats and mitigations']`
+
+Example:
+```json
+{
+  "id": "VG006",
+  "enabled": true,
+  "config": {
+    "threat_model_path": "THREAT_MODEL.md",
+    "required_sections": [
+      "Assets",
+      "Actors",
+      "Trust boundaries",
+      "Key threats and mitigations"
+    ]
+  }
+}
+```
+
 ## Scope filters
 Policy supports global scope filters and per-gate overrides:
 - `include_paths: list[str]` optional glob allowlist
