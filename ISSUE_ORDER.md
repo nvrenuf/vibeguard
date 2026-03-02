@@ -14,7 +14,7 @@
    - Require version/provenance metadata in policy bundles.
 6. #7 ✅ Define canonical Findings JSON format (PR #24)
    - Standardize Findings JSON schema for all outputs.
-7. #8 Add SARIF output option
+7. #8 ✅ Add SARIF output option (PR TBD)
    - Provide SARIF as an alternate findings export.
 8. #9 ✅ Implement gate runner framework (PR #25)
    - Create gate execution and aggregation framework.

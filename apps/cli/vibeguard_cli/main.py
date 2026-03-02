@@ -14,6 +14,7 @@ DEFAULT_AUDIT_OUT_DIR = Path("out/audit-pack")
 INIT_POLICY_PATH = Path("policies/bundles/baseline/policy.yaml")
 INIT_FOLDERS = [Path("out/audit-pack"), Path("out/findings"), Path("evidence")]
 SEVERITY_ORDER = {"low": 0, "medium": 1, "high": 2, "critical": 3}
+SARIF_LEVEL = {"low": "note", "medium": "warning", "high": "error", "critical": "error"}
 
 
 def _sort_findings(report_json: dict[str, object]) -> None:
@@ -32,14 +33,63 @@ def _sort_findings(report_json: dict[str, object]) -> None:
 
 
 def _parse_format(output_format: str) -> str:
-    if output_format == "json":
-        return "json"
-    if output_format == "sarif":
-        raise ValueError(
-            "--format sarif is reserved for Issue #8 and not available yet. "
-            "Use --format json for now."
+    if output_format in {"json", "sarif"}:
+        return output_format
+    raise ValueError("--format must be one of: json, sarif")
+
+
+def _to_sarif(report_json: dict[str, object]) -> dict[str, object]:
+    findings = report_json.get("findings", [])
+    if not isinstance(findings, list):
+        findings = []
+
+    rules_by_id: dict[str, dict[str, object]] = {}
+    results: list[dict[str, object]] = []
+    for finding in findings:
+        if not isinstance(finding, dict):
+            continue
+        rule_id = str(finding.get("gate_id", "UNKNOWN"))
+        rules_by_id.setdefault(
+            rule_id,
+            {
+                "id": rule_id,
+                "name": str(finding.get("title", rule_id)),
+                "shortDescription": {"text": str(finding.get("title", rule_id))},
+            },
         )
-    raise ValueError(f"Unsupported format: {output_format}")
+        result: dict[str, object] = {
+            "ruleId": rule_id,
+            "level": SARIF_LEVEL.get(str(finding.get("severity", "low")), "warning"),
+            "message": {"text": str(finding.get("message", ""))},
+        }
+        path = finding.get("path")
+        if isinstance(path, str) and path:
+            location: dict[str, object] = {
+                "physicalLocation": {
+                    "artifactLocation": {"uri": path},
+                },
+            }
+            line = finding.get("line")
+            if isinstance(line, int) and line > 0:
+                location["physicalLocation"]["region"] = {"startLine": line}  # type: ignore[index]
+            result["locations"] = [location]
+        results.append(result)
+
+    return {
+        "version": "2.1.0",
+        "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+        "runs": [
+            {
+                "tool": {
+                    "driver": {
+                        "name": "vibeguard",
+                        "rules": [rules_by_id[key] for key in sorted(rules_by_id)],
+                    }
+                },
+                "results": results,
+            }
+        ],
+    }
 
 
 def _should_fail(findings: list[dict[str, object]], fail_on: str) -> bool:
@@ -72,7 +122,11 @@ def run_check(
     report = run_gates(policy=policy_bundle, repo_path=repo)
     payload_obj = json.loads(report.to_json())
     _sort_findings(payload_obj)
-    payload = json.dumps(payload_obj, indent=2, sort_keys=True)
+    if output_format == "sarif":
+        payload_obj_out = _to_sarif(payload_obj)
+        payload = json.dumps(payload_obj_out, indent=2, sort_keys=True)
+    else:
+        payload = json.dumps(payload_obj, indent=2, sort_keys=True)
     if out:
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(payload, encoding="utf-8")
