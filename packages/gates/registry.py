@@ -32,6 +32,13 @@ DEFAULT_FORBIDDEN = [
 DEFAULT_LICENSE_PATHS = ["LICENSE", "LICENSE.md", "LICENSE.txt"]
 DEFAULT_NOTICES_PATHS = ["THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.txt"]
 DEFAULT_REQUIRED_WORKFLOWS = [".github/workflows/verify.yml"]
+DEFAULT_THREAT_MODEL_PATH = "THREAT_MODEL.md"
+DEFAULT_THREAT_MODEL_SECTIONS = [
+    "Assets",
+    "Actors",
+    "Trust boundaries",
+    "Key threats and mitigations",
+]
 
 
 class VG001RequiredFilesGate(Gate):
@@ -225,12 +232,59 @@ class VG005RequiredWorkflowsGate(Gate):
         ]
 
 
+class VG006ThreatModelStructureGate(Gate):
+    id = "VG006"
+    description = "Threat model document must exist and contain required sections"
+
+    def run(self, ctx: GateContext) -> list[Finding]:
+        threat_model_path = ctx.gate_config.config.get(
+            "threat_model_path",
+            DEFAULT_THREAT_MODEL_PATH,
+        )
+        required_sections = ctx.gate_config.config.get(
+            "required_sections",
+            DEFAULT_THREAT_MODEL_SECTIONS,
+        )
+
+        path = ctx.repo_path / threat_model_path
+        if not path.is_file():
+            return [
+                Finding(
+                    id="VG006:missing-threat-model",
+                    gate_id=self.id,
+                    severity="high",
+                    title="Missing threat model document",
+                    message=f"Add {threat_model_path} with required threat model sections.",
+                    path=threat_model_path,
+                ),
+            ]
+
+        content = path.read_text(encoding="utf-8")
+        heading_lines = [line.strip().lstrip("#").strip() for line in content.splitlines()]
+
+        missing = [section for section in required_sections if section not in heading_lines]
+        if not missing:
+            return []
+
+        return [
+            Finding(
+                id="VG006:missing-sections",
+                gate_id=self.id,
+                severity="high",
+                title="Threat model missing required sections",
+                message=f"Add these sections to {threat_model_path}: {', '.join(missing)}.",
+                path=threat_model_path,
+            ),
+        ]
+
+
 GATE_REGISTRY: dict[str, type[Gate]] = {
     VG001RequiredFilesGate.id: VG001RequiredFilesGate,
     VG002ForbiddenDirectoriesGate.id: VG002ForbiddenDirectoriesGate,
     VG003BasicSecretScanGate.id: VG003BasicSecretScanGate,
     VG004LicenseAndNoticesGate.id: VG004LicenseAndNoticesGate,
     VG005RequiredWorkflowsGate.id: VG005RequiredWorkflowsGate,
+    VG006ThreatModelStructureGate.id: VG006ThreatModelStructureGate,
 }
 
 

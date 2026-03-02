@@ -89,7 +89,10 @@ def test_vg003_detects_patterns_without_secret_value_leak(tmp_path: Path) -> Non
 
     assert len(report.findings) == 4
     serialized = json.dumps([asdict(finding) for finding in report.findings])
+    assert "AKIA1234567890ABCDEF" not in serialized
     assert "superSecretTokenValue" not in serialized
+    assert "xoxb-1234567890-abcdefghijkl" not in serialized
+    assert "BEGIN PRIVATE KEY" not in serialized
 
 
 def test_vg003_allow_paths_excludes_files(tmp_path: Path) -> None:

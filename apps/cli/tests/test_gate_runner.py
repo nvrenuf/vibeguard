@@ -11,6 +11,14 @@ def _write_required_files(repo: Path) -> None:
     for file_name in REQUIRED_FILES:
         (repo / file_name).write_text("ok\n", encoding="utf-8")
     (repo / "LICENSE").write_text("MIT\n", encoding="utf-8")
+    threat_model = (
+        "# Threat Model\n\n"
+        "## Assets\n"
+        "## Actors\n"
+        "## Trust boundaries\n"
+        "## Key threats and mitigations\n"
+    )
+    (repo / "THREAT_MODEL.md").write_text(threat_model, encoding="utf-8")
     workflow_dir = repo / ".github" / "workflows"
     workflow_dir.mkdir(parents=True, exist_ok=True)
     (workflow_dir / "verify.yml").write_text("name: verify\n", encoding="utf-8")
