@@ -35,12 +35,17 @@ def run_audit_pack(repo: Path, policy: Path, out_dir: Path = DEFAULT_AUDIT_OUT_D
 
     (out_dir / "reports").mkdir(parents=True, exist_ok=True)
     (out_dir / "evidence").mkdir(parents=True, exist_ok=True)
+    (out_dir / "policy_bundle").mkdir(parents=True, exist_ok=True)
 
     report = run_gates(policy=policy_bundle, repo_path=repo)
 
     (out_dir / "reports" / "findings.json").write_text(report.to_json(), encoding="utf-8")
     (out_dir / "reports" / "summary.md").write_text(
         "# VibeGuard Audit Pack\n\nStub.\n",
+        encoding="utf-8",
+    )
+    (out_dir / "policy_bundle" / "policy.yaml").write_text(
+        policy.read_text(encoding="utf-8"),
         encoding="utf-8",
     )
     print(str(out_dir))

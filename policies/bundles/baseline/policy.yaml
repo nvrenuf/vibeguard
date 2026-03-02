@@ -2,11 +2,38 @@
   "id": "baseline",
   "version": "0.1.0",
   "description": "Baseline gates for VibeGuard v0",
+  "include_paths": ["**"],
+  "exclude_paths": [".git/**"],
   "gates": [
     {
       "id": "VG001",
       "enabled": true,
       "config": {}
+    },
+    {
+      "id": "VG002",
+      "enabled": true,
+      "config": {
+        "forbidden": [
+          "node_modules",
+          "dist",
+          "build",
+          ".next",
+          ".venv",
+          "__pycache__",
+          ".env",
+          "secrets"
+        ],
+        "allow": []
+      }
+    },
+    {
+      "id": "VG003",
+      "enabled": true,
+      "config": {
+        "allow_paths": [],
+        "allow_patterns": []
+      }
     }
   ]
 }
