@@ -6,6 +6,7 @@ from pathlib import Path
 
 from packages.core.policy_loader import PolicyLoadError, load_policy_bundle
 from packages.gates.runner import run_gates
+from packages.reporting.audit_pack import create_audit_pack
 
 DEFAULT_POLICY_PATH = Path("policies/bundles/baseline/policy.yaml")
 DEFAULT_AUDIT_OUT_DIR = Path("out/audit-pack")
@@ -32,24 +33,15 @@ def run_check(repo: Path, policy: Path, out: Path | None = None) -> int:
 def run_audit_pack(repo: Path, policy: Path, out_dir: Path = DEFAULT_AUDIT_OUT_DIR) -> int:
     _validate_repo(repo)
     policy_bundle = load_policy_bundle(policy)
-
-    (out_dir / "reports").mkdir(parents=True, exist_ok=True)
-    (out_dir / "evidence").mkdir(parents=True, exist_ok=True)
-    (out_dir / "policy_bundle").mkdir(parents=True, exist_ok=True)
-
     report = run_gates(policy=policy_bundle, repo_path=repo)
-
-    (out_dir / "reports" / "findings.json").write_text(report.to_json(), encoding="utf-8")
-    (out_dir / "reports" / "summary.md").write_text(
-        "# VibeGuard Audit Pack\n\nStub.\n",
-        encoding="utf-8",
+    run_dir = create_audit_pack(
+        repo_path=repo,
+        policy_path=policy,
+        findings_report=report,
+        out_dir=out_dir,
     )
-    (out_dir / "policy_bundle" / "policy.yaml").write_text(
-        policy.read_text(encoding="utf-8"),
-        encoding="utf-8",
-    )
-    print(str(out_dir))
-    return 0
+    print(str(run_dir))
+    return 0 if report.summary.overall_status == "pass" else 1
 
 
 def build_parser() -> argparse.ArgumentParser:
