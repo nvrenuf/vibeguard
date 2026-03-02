@@ -32,7 +32,7 @@
    - Complete vibeguard check command behavior and UX.
 15. #16 ✅ CLI: implement vibeguard audit-pack fully (PR #34)
    - Complete vibeguard audit-pack command behavior and UX.
-16. #17 CLI: add vibeguard init
+16. #17 ✅ CLI: add vibeguard init (PR TBD)
    - Add init command for project bootstrap.
 17. #18 ✅ CI: run vibeguard on PRs (PR #31)
    - Run VibeGuard checks in PR CI workflows.

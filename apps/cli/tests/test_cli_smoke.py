@@ -21,6 +21,12 @@ def test_audit_pack_help() -> None:
     assert exc.value.code == 0
 
 
+def test_init_help() -> None:
+    with pytest.raises(SystemExit) as exc:
+        main(["init", "--help"])
+    assert exc.value.code == 0
+
+
 def test_check_returns_non_zero_when_required_file_missing(tmp_path) -> None:
     repo = tmp_path / "repo"
     repo.mkdir()

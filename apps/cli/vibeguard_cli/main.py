@@ -11,6 +11,8 @@ from packages.reporting.audit_pack import create_audit_pack
 
 DEFAULT_POLICY_PATH = Path("policies/bundles/baseline/policy.yaml")
 DEFAULT_AUDIT_OUT_DIR = Path("out/audit-pack")
+INIT_POLICY_PATH = Path("policies/bundles/baseline/policy.yaml")
+INIT_FOLDERS = [Path("out/audit-pack"), Path("out/findings"), Path("evidence")]
 SEVERITY_ORDER = {"low": 0, "medium": 1, "high": 2, "critical": 3}
 
 
@@ -105,6 +107,31 @@ def run_audit_pack(
     return 0 if report.summary.overall_status == "pass" else 1
 
 
+def run_init(target_dir: Path, *, force: bool = False) -> int:
+    target_dir.mkdir(parents=True, exist_ok=True)
+    created: list[Path] = []
+
+    src_policy = DEFAULT_POLICY_PATH
+    dst_policy = target_dir / INIT_POLICY_PATH
+    dst_policy.parent.mkdir(parents=True, exist_ok=True)
+
+    if dst_policy.exists() and not force:
+        raise ValueError(f"Refusing to overwrite existing file without --force: {dst_policy}")
+    dst_policy.write_text(src_policy.read_text(encoding="utf-8"), encoding="utf-8")
+    created.append(dst_policy)
+
+    for rel in INIT_FOLDERS:
+        folder = target_dir / rel
+        if not folder.exists():
+            folder.mkdir(parents=True, exist_ok=True)
+            created.append(folder)
+
+    print("Initialized VibeGuard project:")
+    for item in created:
+        print(f"- {item}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="vibeguard", description="VibeGuard CLI")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -135,6 +162,14 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Always exit 0 after writing the audit pack, even if findings fail.",
     )
+
+    init_cmd = sub.add_parser("init", help="Initialize VibeGuard files in a target directory")
+    init_cmd.add_argument("target", nargs="?", type=Path, default=Path("."))
+    init_cmd.add_argument(
+        "--force",
+        action="store_true",
+        help="Overwrite generated files if they already exist.",
+    )
     return parser
 
 
@@ -157,6 +192,8 @@ def main(argv: list[str] | None = None) -> int:
                 out_dir=args.out_dir,
                 force_pack=args.force_pack,
             )
+        if args.command == "init":
+            return run_init(target_dir=args.target, force=args.force)
     except (PolicyLoadError, ValueError) as exc:
         parser.error(str(exc))
     return 0
