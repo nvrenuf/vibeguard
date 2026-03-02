@@ -7,16 +7,41 @@ set -euo pipefail
 #   REPO="nvrenuf/vibeguard" bash tools/create_v01_backlog.sh
 
 : "${REPO:?Set REPO=owner/name before running}"
+MILESTONE_TITLE="${MILESTONE_TITLE:-v0.1}"
+DRY_RUN="${DRY_RUN:-0}"
 
 if ! command -v gh >/dev/null 2>&1; then
   echo "gh CLI is required but not installed." >&2
   exit 1
 fi
 
-if ! command -v jq >/dev/null 2>&1; then
-  echo "jq is required but not installed." >&2
-  exit 1
+if [[ "$DRY_RUN" != "1" ]]; then
+  if ! gh auth status -h github.com; then
+    echo "GitHub CLI is not authenticated for github.com. Run: gh auth login -h github.com" >&2
+    exit 1
+  fi
 fi
+
+run_cmd() {
+  if [[ "$DRY_RUN" == "1" ]]; then
+    echo "[dry-run] $*"
+    return 0
+  fi
+  "$@"
+}
+
+label_exists() {
+  local target="$1"
+  if [[ "$DRY_RUN" == "1" ]]; then
+    return 1
+  fi
+  while IFS= read -r existing; do
+    if [[ "$existing" == "$target" ]]; then
+      return 0
+    fi
+  done < <(gh label list --repo "$REPO" --limit 200 --json name --jq '.[].name')
+  return 1
+}
 
 labels=(
   "v0.1"
@@ -31,17 +56,39 @@ labels=(
   "hardening"
 )
 
+echo "Ensuring labels exist..."
 for label in "${labels[@]}"; do
-  if ! gh label list --repo "$REPO" --limit 200 --json name | jq -e --arg n "$label" '.[] | select(.name==$n)' >/dev/null; then
-    gh label create "$label" --repo "$REPO" --color "1D76DB" --description "VibeGuard v0.1 tracking label"
+  if label_exists "$label"; then
+    echo "  label exists: $label"
+  else
+    run_cmd gh label create "$label" --repo "$REPO" --color "1D76DB" --description "VibeGuard v0.1 tracking label"
+    echo "  label created: $label"
   fi
 done
 
-if ! gh api "repos/$REPO/milestones" --paginate | jq -e '.[] | select(.title=="v0.1")' >/dev/null; then
-  gh api -X POST "repos/$REPO/milestones" -f title='v0.1' -f description='VibeGuard v0.1 backlog'
+echo "Ensuring milestone exists: $MILESTONE_TITLE"
+if [[ "$DRY_RUN" == "1" ]]; then
+  run_cmd gh api -X POST "repos/$REPO/milestones" -f "title=$MILESTONE_TITLE" -f "description=VibeGuard $MILESTONE_TITLE backlog"
+  echo "  milestone created: $MILESTONE_TITLE"
+else
+  milestone_found=""
+  while IFS= read -r title; do
+    if [[ "$title" == "$MILESTONE_TITLE" ]]; then
+      milestone_found="1"
+      break
+    fi
+  done < <(gh api "repos/$REPO/milestones?state=all&per_page=100" --jq '.[].title')
+
+  if [[ -z "$milestone_found" ]]; then
+    run_cmd gh api -X POST "repos/$REPO/milestones" -f "title=$MILESTONE_TITLE" -f "description=VibeGuard $MILESTONE_TITLE backlog"
+    echo "  milestone created: $MILESTONE_TITLE"
+  else
+    echo "  milestone exists: $MILESTONE_TITLE"
+  fi
 fi
 
-milestone_number=$(gh api "repos/$REPO/milestones" --paginate | jq -r '.[] | select(.title=="v0.1") | .number' | head -n1)
+created_count=0
+existing_count=0
 
 create_issue() {
   local title="$1"
@@ -71,15 +118,44 @@ $tests
 EOT
 )
 
+  if [[ "$DRY_RUN" != "1" ]]; then
+    local existing_url=""
+    while IFS=$'\t' read -r existing_title listed_url; do
+      if [[ "$existing_title" == "$title" ]]; then
+        existing_url="$listed_url"
+        break
+      fi
+    done < <(gh issue list --repo "$REPO" --state all --milestone "$MILESTONE_TITLE" --limit 200 --json title,url --jq '.[] | [.title, .url] | @tsv')
+
+    if [[ -n "$existing_url" ]]; then
+      existing_count=$((existing_count + 1))
+      echo "  issue exists: $title" >&2
+      echo "$existing_url"
+      return 0
+    fi
+  fi
+
+  if [[ "$DRY_RUN" == "1" ]]; then
+    echo "[dry-run] gh issue create --repo $REPO --title $title --milestone $MILESTONE_TITLE --label $labels_csv --body <omitted>" >&2
+    echo "https://github.com/$REPO/issues/DRY-RUN"
+    return 0
+  fi
+
+  created_count=$((created_count + 1))
+  echo "  creating issue: $title" >&2
   gh issue create \
     --repo "$REPO" \
     --title "$title" \
-    --milestone "$milestone_number" \
+    --milestone "$MILESTONE_TITLE" \
     --label "$labels_csv" \
     --body "$body"
 }
 
-mapfile -t issue_urls < <(
+echo "Ensuring backlog issues exist..."
+issue_urls=()
+while IFS= read -r line; do
+  issue_urls+=("$line")
+done < <(
 create_issue "Freeze v0.1 scope and definitions" "v0.1,milestone:A-spec" \
 "Lock the exact v0.1 in-scope/out-of-scope boundaries and key definitions used across specs and implementation." \
 "Define terms, delivery boundaries, and non-goals for v0.1." \
@@ -218,7 +294,7 @@ create_issue "Logging + redaction policy" "v0.1,hardening" \
 {
   echo "# VibeGuard Backlog Order"
   echo
-  echo "**Milestone:** \\`v0.1\\`"
+  echo "**Milestone:** \`$MILESTONE_TITLE\`"
   echo
   i=1
   titles=(
@@ -270,6 +346,9 @@ create_issue "Logging + redaction policy" "v0.1,hardening" \
     "Define and enforce logging/redaction policy."
   )
   for url in "${issue_urls[@]}"; do
+    if [[ "$url" == \[* ]]; then
+      continue
+    fi
     num="${url##*/}"
     idx=$((i-1))
     echo "$i. #$num ${titles[$idx]}"
@@ -278,4 +357,5 @@ create_issue "Logging + redaction policy" "v0.1,hardening" \
   done
 } > ISSUE_ORDER.md
 
-echo "Created ${#issue_urls[@]} issues and updated ISSUE_ORDER.md"
+echo "Updated ISSUE_ORDER.md"
+echo "Summary: created=$created_count existing=$existing_count total=${#issue_urls[@]} milestone=$MILESTONE_TITLE"
