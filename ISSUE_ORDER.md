@@ -30,7 +30,7 @@
    - Capture environment/toolchain metadata in audit packs.
 14. #15 ✅ CLI: implement vibeguard check fully (PR #33)
    - Complete vibeguard check command behavior and UX.
-15. #16 ✅ CLI: implement vibeguard audit-pack fully (PR TBD)
+15. #16 ✅ CLI: implement vibeguard audit-pack fully (PR #34)
    - Complete vibeguard audit-pack command behavior and UX.
 16. #17 CLI: add vibeguard init
    - Add init command for project bootstrap.
