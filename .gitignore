@@ -7,3 +7,6 @@ build/
 
 # local pre-commit cache
 .pc-home/
+
+# local pre-commit cache
+.pc-home/
