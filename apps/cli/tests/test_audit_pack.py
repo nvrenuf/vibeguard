@@ -127,3 +127,29 @@ def test_cli_writes_pack_even_when_failing(tmp_path: Path, capsys) -> None:
     findings = json.loads((run_dir / "reports" / "findings.json").read_text(encoding="utf-8"))
     assert findings["summary"]["overall_status"] == "fail"
     assert (run_dir / "reports" / "summary.md").is_file()
+
+
+def test_cli_force_pack_exits_zero_on_fail(tmp_path: Path, capsys) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+
+    out_dir = tmp_path / "audit-pack"
+    exit_code = main(
+        [
+            "audit-pack",
+            str(repo),
+            "--policy",
+            str(POLICY_PATH),
+            "--out-dir",
+            str(out_dir),
+            "--force-pack",
+        ],
+    )
+    assert exit_code == 0
+
+    printed_path = capsys.readouterr().out.strip()
+    run_dir = Path(printed_path)
+    assert run_dir.exists()
+
+    findings = json.loads((run_dir / "reports" / "findings.json").read_text(encoding="utf-8"))
+    assert findings["summary"]["overall_status"] == "fail"

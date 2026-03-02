@@ -83,7 +83,13 @@ def run_check(
     return 1 if _should_fail(findings, fail_on) else 0
 
 
-def run_audit_pack(repo: Path, policy: Path, out_dir: Path = DEFAULT_AUDIT_OUT_DIR) -> int:
+def run_audit_pack(
+    repo: Path,
+    policy: Path,
+    out_dir: Path = DEFAULT_AUDIT_OUT_DIR,
+    *,
+    force_pack: bool = False,
+) -> int:
     _validate_repo(repo)
     policy_bundle = load_policy_bundle(policy)
     report = run_gates(policy=policy_bundle, repo_path=repo)
@@ -94,6 +100,8 @@ def run_audit_pack(repo: Path, policy: Path, out_dir: Path = DEFAULT_AUDIT_OUT_D
         out_dir=out_dir,
     )
     print(str(run_dir))
+    if force_pack:
+        return 0
     return 0 if report.summary.overall_status == "pass" else 1
 
 
@@ -122,6 +130,11 @@ def build_parser() -> argparse.ArgumentParser:
     audit_cmd.add_argument("repo", type=Path)
     audit_cmd.add_argument("--policy", type=Path, default=DEFAULT_POLICY_PATH)
     audit_cmd.add_argument("--out-dir", type=Path, default=DEFAULT_AUDIT_OUT_DIR)
+    audit_cmd.add_argument(
+        "--force-pack",
+        action="store_true",
+        help="Always exit 0 after writing the audit pack, even if findings fail.",
+    )
     return parser
 
 
@@ -138,7 +151,12 @@ def main(argv: list[str] | None = None) -> int:
                 output_format=args.format,
             )
         if args.command == "audit-pack":
-            return run_audit_pack(repo=args.repo, policy=args.policy, out_dir=args.out_dir)
+            return run_audit_pack(
+                repo=args.repo,
+                policy=args.policy,
+                out_dir=args.out_dir,
+                force_pack=args.force_pack,
+            )
     except (PolicyLoadError, ValueError) as exc:
         parser.error(str(exc))
     return 0
