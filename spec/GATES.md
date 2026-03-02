@@ -40,6 +40,50 @@ Config:
 
 Findings are `high` severity and include path + pattern name, never the secret value.
 
+### VG004 — License / Third-Party Notices
+Checks for repository licensing and optional third-party notices files.
+
+Defaults:
+- License required
+- Third-party notices optional
+
+Config:
+- `require_license: bool` (default `true`)
+- `require_third_party_notices: bool` (default `false`)
+- `license_paths: list[str]` (default `['LICENSE', 'LICENSE.md', 'LICENSE.txt']`)
+- `notices_paths: list[str]` (default `['THIRD_PARTY_NOTICES.md', 'THIRD_PARTY_NOTICES.txt']`)
+
+Example:
+```json
+{
+  "id": "VG004",
+  "enabled": true,
+  "config": {
+    "require_license": true,
+    "require_third_party_notices": false,
+    "license_paths": ["LICENSE", "LICENSE.md", "LICENSE.txt"],
+    "notices_paths": ["THIRD_PARTY_NOTICES.md", "THIRD_PARTY_NOTICES.txt"]
+  }
+}
+```
+
+### VG005 — CI Workflow Presence
+Checks that required CI workflow files are present.
+
+Config:
+- `required_workflows: list[str]` (default `['.github/workflows/verify.yml']`)
+
+Example:
+```json
+{
+  "id": "VG005",
+  "enabled": true,
+  "config": {
+    "required_workflows": [".github/workflows/verify.yml"]
+  }
+}
+```
+
 ## Scope filters
 Policy supports global scope filters and per-gate overrides:
 - `include_paths: list[str]` optional glob allowlist

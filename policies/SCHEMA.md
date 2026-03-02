@@ -21,3 +21,19 @@ Each gate entry supports:
 - `exclude_paths: list[str]` (optional, overrides global for this gate)
 
 See: `policies/bundles/baseline/policy.yaml`.
+
+## Baseline gate config keys (v0.1)
+- `VG001`: no gate-specific config keys.
+- `VG002`:
+  - `forbidden: list[str]`
+  - `allow: list[str]`
+- `VG003`:
+  - `allow_paths: list[str]`
+  - `allow_patterns: list[str]`
+- `VG004`:
+  - `require_license: bool` (default `true`)
+  - `require_third_party_notices: bool` (default `false`)
+  - `license_paths: list[str]` (default `['LICENSE', 'LICENSE.md', 'LICENSE.txt']`)
+  - `notices_paths: list[str]` (default `['THIRD_PARTY_NOTICES.md', 'THIRD_PARTY_NOTICES.txt']`)
+- `VG005`:
+  - `required_workflows: list[str]` (default `['.github/workflows/verify.yml']`)
