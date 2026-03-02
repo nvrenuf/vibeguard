@@ -5,7 +5,7 @@ import sys
 from pathlib import Path
 
 from packages.core.policy_loader import PolicyLoadError, load_policy_bundle
-from packages.reporting.findings import FindingsReport
+from packages.gates.runner import run_gates
 
 DEFAULT_POLICY_PATH = Path("policies/bundles/baseline/policy.yaml")
 DEFAULT_AUDIT_OUT_DIR = Path("out/audit-pack")
@@ -19,19 +19,14 @@ def _validate_repo(repo: Path) -> None:
 def run_check(repo: Path, policy: Path, out: Path | None = None) -> int:
     _validate_repo(repo)
     policy_bundle = load_policy_bundle(policy)
-    report = FindingsReport.create(
-        repo=str(repo),
-        policy_id=policy_bundle.id,
-        policy_version=policy_bundle.version,
-        findings=[],
-    )
+    report = run_gates(policy=policy_bundle, repo_path=repo)
     payload = report.to_json()
     if out:
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(payload, encoding="utf-8")
     else:
         print(payload)
-    return 0
+    return 0 if report.summary.overall_status == "pass" else 1
 
 
 def run_audit_pack(repo: Path, policy: Path, out_dir: Path = DEFAULT_AUDIT_OUT_DIR) -> int:
@@ -41,12 +36,7 @@ def run_audit_pack(repo: Path, policy: Path, out_dir: Path = DEFAULT_AUDIT_OUT_D
     (out_dir / "reports").mkdir(parents=True, exist_ok=True)
     (out_dir / "evidence").mkdir(parents=True, exist_ok=True)
 
-    report = FindingsReport.create(
-        repo=str(repo),
-        policy_id=policy_bundle.id,
-        policy_version=policy_bundle.version,
-        findings=[],
-    )
+    report = run_gates(policy=policy_bundle, repo_path=repo)
 
     (out_dir / "reports" / "findings.json").write_text(report.to_json(), encoding="utf-8")
     (out_dir / "reports" / "summary.md").write_text(
