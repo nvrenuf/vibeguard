@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+from packages.reporting.findings import Finding, FindingsReport
+
 from vibeguard_cli.main import run_check
 
 
@@ -27,3 +29,46 @@ def test_check_outputs_findings_json(tmp_path: Path, capsys) -> None:
     assert payload["summary"]["overall_status"] == "pass"
     assert payload["findings"] == []
 
+
+def test_check_fail_on_threshold_controls_exit_code(tmp_path: Path, monkeypatch) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _write_required_files(repo)
+
+    mocked_report = FindingsReport.create(
+        repo=str(repo),
+        policy_id="baseline",
+        policy_version="0.1.0",
+        findings=[
+            Finding(
+                id="F-1",
+                gate_id="VG001",
+                severity="medium",
+                title="Medium issue",
+                message="x",
+            ),
+        ],
+    )
+
+    monkeypatch.setattr("vibeguard_cli.main.run_gates", lambda policy, repo_path: mocked_report)
+
+    assert run_check(repo, Path("policies/bundles/baseline/policy.yaml"), fail_on="high") == 0
+    assert run_check(repo, Path("policies/bundles/baseline/policy.yaml"), fail_on="medium") == 1
+    assert run_check(repo, Path("policies/bundles/baseline/policy.yaml"), fail_on="low") == 1
+
+
+def test_check_rejects_sarif_until_issue_8(tmp_path: Path) -> None:
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    _write_required_files(repo)
+
+    try:
+        run_check(
+            repo,
+            Path("policies/bundles/baseline/policy.yaml"),
+            output_format="sarif",
+        )
+    except ValueError as exc:
+        assert "Issue #8" in str(exc)
+    else:
+        raise AssertionError("Expected ValueError when output_format=sarif")
